@@ -82,6 +82,11 @@ const CreateNew = (props) => {
 
   const navigate = useNavigate();
 
+  const resetFields = () => {
+    content.reset();
+    author.reset();
+    info.reset();
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     props.addNew({
@@ -99,17 +104,35 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input {...content} />
+          <input
+            {...(() => {
+              const { reset, ...contentData } = content;
+              return contentData;
+            })()}
+          />
         </div>
         <div>
           author
-          <input {...author} />
+          <input
+            {...(() => {
+              const { reset, ...authorData } = author;
+              return authorData;
+            })()}
+          />
         </div>
         <div>
           url for more info
-          <input {...info} />
+          <input
+            {...(() => {
+              const { reset, ...infoData } = info;
+              return infoData;
+            })()}
+          />
         </div>
-        <button>create</button>
+        <button type="submit">create</button>
+        <button type="reset" onClick={resetFields}>
+          reset
+        </button>
       </form>
     </div>
   );
