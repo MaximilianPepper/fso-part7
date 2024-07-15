@@ -13,6 +13,10 @@ const blogsReducer = (state = [], action) => {
           b.id === action.payload ? { ...b, likes: b.likes + 1 } : b
         )
         .sort((a, b) => b.likes - a.likes);
+    case "COMMENT":
+      return state.map((b) =>
+        b.id === action.payload.id ? action.payload : b
+      );
     default:
       return state;
   }

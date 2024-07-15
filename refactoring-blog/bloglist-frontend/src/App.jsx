@@ -115,6 +115,10 @@ const App = () => {
     setTimeout(() => dispatch({ type: "RESET" }), 5000);
     blogRef.current.toggleVisibility();
   };
+  const createComment = async (id, comment) => {
+    const updatedBlog = await blogService.commentBlog(id, comment);
+    dispatch({ type: "COMMENT", payload: updatedBlog });
+  };
 
   const increaseLikes = async (blog) => {
     const updatedBlog = await blogService.likeBlog(blog);
@@ -155,6 +159,7 @@ const App = () => {
               blogs={blogs}
               increaseLikes={increaseLikes}
               deleteBlog={deleteBlog}
+              createComment={createComment}
             />
           }
         />
