@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import Users from "./components/Users";
+import UserData from "./components/UserData";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import userService from "./services/users";
 import "./app.css";
 import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Toggable";
@@ -18,6 +20,7 @@ const App = () => {
   const notification = useSelector((state) => state.notification); // is object with .notification and .class properties
   const blogs = useSelector((state) => state.blogs);
   const user = useSelector((state) => state.user);
+  const [users, setUsers] = useState([]);
 
   const blogRef = useRef();
   useEffect(() => {
@@ -28,6 +31,10 @@ const App = () => {
       });
     });
   }, []);
+  // this could be better
+  useEffect(() => {
+    userService.getAll().then((u) => setUsers(u));
+  }, [blogs]);
   const handleLogin = async (event) => {
     event.preventDefault();
 
@@ -140,6 +147,7 @@ const App = () => {
         <BlogForm createBlog={createBlog} />
       </Togglable>
       <Routes>
+        <Route path="/:id" element={<UserData users={users} />} />
         <Route
           path="/"
           element={blogs.map((blog) => (
@@ -151,7 +159,7 @@ const App = () => {
             />
           ))}
         />
-        <Route path="/users" element={<Users />} />
+        <Route path="/users" element={<Users users={users} />} />
       </Routes>
     </Router>
   );
