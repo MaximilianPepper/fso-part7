@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
+import Users from "./components/Users";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import "./app.css";
 import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Toggable";
 import { useSelector, useDispatch } from "react-redux"; // redux refactoring es 7.10
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 const App = () => {
   const [username, setUsername] = useState("");
@@ -127,21 +129,31 @@ const App = () => {
     dispatch({ type: "DELETE", payload: blog.id });
   };
   const loggedIn = () => (
-    <>
-      <p>{user.name} logged in </p>
+    <Router>
+      <nav>
+        <Link to="/">blogs </Link>
+        <Link to="/users">users </Link>
+        {user.name} logged in
+      </nav>
       <button onClick={() => logout()}>logout</button>
       <Togglable buttonName="new blog" ref={blogRef}>
         <BlogForm createBlog={createBlog} />
       </Togglable>
-      {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          increaseLikes={increaseLikes}
-          deleteBlog={deleteBlog}
+      <Routes>
+        <Route
+          path="/"
+          element={blogs.map((blog) => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              increaseLikes={increaseLikes}
+              deleteBlog={deleteBlog}
+            />
+          ))}
         />
-      ))}
-    </>
+        <Route path="/users" element={<Users />} />
+      </Routes>
+    </Router>
   );
   return (
     <div>
