@@ -5,14 +5,17 @@ import loginService from "./services/login";
 import "./app.css";
 import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Toggable";
+import { useSelector, useDispatch } from "react-redux"; // redux refactoring es 7.10
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [notificationMessage, setNotificationMessage] = useState(null);
+
+  // redux
+  const dispatch = useDispatch();
+  const notification = useSelector((state) => state); // is object with .notification and .class properties
 
   const blogRef = useRef();
   useEffect(() => {
@@ -34,15 +37,17 @@ const App = () => {
       setUser(user);
       setUsername("");
       setPassword("");
-      setNotificationMessage(`logged in as ${user.username}`);
-      setTimeout(() => {
-        setNotificationMessage(null);
-      }, 5000);
+      dispatch({
+        type: "SET",
+        payload: `logged in as ${user.username}`,
+      });
+      setTimeout(() => dispatch({ type: "RESET" }), 5000);
     } catch (exception) {
-      setErrorMessage("Wrong username or password");
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch({
+        type: "ERROR",
+        payload: `wrong username or password`,
+      });
+      setTimeout(() => dispatch({ type: "RESET" }), 5000);
     }
   };
 
@@ -79,10 +84,11 @@ const App = () => {
     </form>
   );
   const logout = () => {
-    setNotificationMessage(`logged out, take care ${user.username}`);
-    setTimeout(() => {
-      setNotificationMessage(null);
-    }, 5000);
+    dispatch({
+      type: "ERROR",
+      payload: `logged out, take care ${user.username}`,
+    });
+    setTimeout(() => dispatch({ type: "RESET" }), 5000);
     setUser(null);
     window.localStorage.clear();
   };
@@ -90,11 +96,12 @@ const App = () => {
   const createBlog = async (blog) => {
     const newBlog = await blogService.create(blog);
     setBlogs([...blogs, newBlog]);
-    setNotificationMessage(`a new blog ${newBlog.title} by ${newBlog.author}`);
+    dispatch({
+      type: "SET",
+      payload: `a new blog ${newBlog.title} by ${newBlog.author}`,
+    });
+    setTimeout(() => dispatch({ type: "RESET" }), 5000);
     blogRef.current.toggleVisibility();
-    setTimeout(() => {
-      setNotificationMessage(null);
-    }, 5000);
   };
 
   const increaseLikes = async (blog) => {
@@ -104,10 +111,20 @@ const App = () => {
         (a, b) => b.likes - a.likes
       )
     );
+    dispatch({
+      type: "SET",
+      payload: `${updatedBlog.title} by ${updatedBlog.author} is liked!`,
+    });
+    setTimeout(() => dispatch({ type: "RESET" }), 5000);
   };
 
   const deleteBlog = async (blog) => {
     await blogService.deleteBlog(blog.id);
+    dispatch({
+      type: "ERROR",
+      payload: `${blog.title} by ${blog.author} IS DELETED!`,
+    });
+    setTimeout(() => dispatch({ type: "RESET" }), 5000);
     setBlogs(blogs.filter((b) => b.id !== blog.id));
   };
   const loggedIn = () => (
@@ -130,10 +147,9 @@ const App = () => {
   return (
     <div>
       <h2>{user ? "blogs" : "login to application"}</h2>
-      {errorMessage ? <div className="error">{errorMessage}</div> : null}
-      {notificationMessage ? (
-        <div className="notification">{notificationMessage}</div>
-      ) : null}
+      {notification && (
+        <div className={notification.class}>{notification.notification}</div>
+      )}
       {user ? loggedIn() : loginForm()}
     </div>
   );
