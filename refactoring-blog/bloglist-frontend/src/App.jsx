@@ -10,12 +10,12 @@ import { useSelector, useDispatch } from "react-redux"; // redux refactoring es 
 const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
 
   // redux
   const dispatch = useDispatch();
   const notification = useSelector((state) => state.notification); // is object with .notification and .class properties
   const blogs = useSelector((state) => state.blogs);
+  const user = useSelector((state) => state.user);
 
   const blogRef = useRef();
   useEffect(() => {
@@ -37,7 +37,7 @@ const App = () => {
       window.localStorage.setItem("loggedUser", JSON.stringify(user));
       blogService.setToken(user.token);
 
-      setUser(user);
+      dispatch({ type: "LOGGED", payload: user });
       setUsername("");
       setPassword("");
       dispatch({
@@ -58,7 +58,7 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem("loggedUser");
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      dispatch({ type: "LOGGED", payload: user });
       blogService.setToken(user.token);
     }
   }, []);
@@ -92,7 +92,7 @@ const App = () => {
       payload: `logged out, take care ${user.username}`,
     });
     setTimeout(() => dispatch({ type: "RESET" }), 5000);
-    setUser(null);
+    dispatch({ type: "LOGOUT" });
     window.localStorage.clear();
   };
 
