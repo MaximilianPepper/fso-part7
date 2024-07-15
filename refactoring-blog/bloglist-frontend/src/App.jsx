@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import Blog from "./components/Blog";
+import BlogData from "./components/BlogData";
 import Users from "./components/Users";
 import UserData from "./components/UserData";
 import blogService from "./services/blogs";
@@ -147,16 +147,25 @@ const App = () => {
         <BlogForm createBlog={createBlog} />
       </Togglable>
       <Routes>
-        <Route path="/:id" element={<UserData users={users} />} />
+        <Route path="/users/:id" element={<UserData users={users} />} />
         <Route
-          path="/"
-          element={blogs.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
+          path="/blogs/:id"
+          element={
+            <BlogData
+              blogs={blogs}
               increaseLikes={increaseLikes}
               deleteBlog={deleteBlog}
             />
+          }
+        />
+        <Route
+          path="/"
+          element={blogs.map((blog) => (
+            <Link to={`/blogs/${blog.id}`} key={blog.id}>
+              <p>
+                {blog.title} by {blog.author}
+              </p>
+            </Link>
           ))}
         />
         <Route path="/users" element={<Users users={users} />} />
