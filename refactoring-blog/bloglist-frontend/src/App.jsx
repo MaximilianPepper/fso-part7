@@ -8,19 +8,22 @@ import Togglable from "./components/Toggable";
 import { useSelector, useDispatch } from "react-redux"; // redux refactoring es 7.10
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
 
   // redux
   const dispatch = useDispatch();
-  const notification = useSelector((state) => state); // is object with .notification and .class properties
+  const notification = useSelector((state) => state.notification); // is object with .notification and .class properties
+  const blogs = useSelector((state) => state.blogs);
 
   const blogRef = useRef();
   useEffect(() => {
     blogService.getAll().then((blogs) => {
-      setBlogs([...blogs].sort((a, b) => b.likes - a.likes));
+      dispatch({
+        type: "GET",
+        payload: [...blogs].sort((a, b) => b.likes - a.likes),
+      });
     });
   }, []);
   const handleLogin = async (event) => {
@@ -95,7 +98,7 @@ const App = () => {
 
   const createBlog = async (blog) => {
     const newBlog = await blogService.create(blog);
-    setBlogs([...blogs, newBlog]);
+    dispatch({ type: "POST", payload: newBlog });
     dispatch({
       type: "SET",
       payload: `a new blog ${newBlog.title} by ${newBlog.author}`,
@@ -106,11 +109,7 @@ const App = () => {
 
   const increaseLikes = async (blog) => {
     const updatedBlog = await blogService.likeBlog(blog);
-    setBlogs(
-      [...blogs.map((b) => (b.id === updatedBlog.id ? updatedBlog : b))].sort(
-        (a, b) => b.likes - a.likes
-      )
-    );
+    dispatch({ type: "LIKE", payload: blog.id });
     dispatch({
       type: "SET",
       payload: `${updatedBlog.title} by ${updatedBlog.author} is liked!`,
@@ -125,7 +124,7 @@ const App = () => {
       payload: `${blog.title} by ${blog.author} IS DELETED!`,
     });
     setTimeout(() => dispatch({ type: "RESET" }), 5000);
-    setBlogs(blogs.filter((b) => b.id !== blog.id));
+    dispatch({ type: "DELETE", payload: blog.id });
   };
   const loggedIn = () => (
     <>
