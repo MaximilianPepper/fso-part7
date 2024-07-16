@@ -1,10 +1,16 @@
 import { forwardRef, useState, useImperativeHandle } from "react";
 import PropTypes from "prop-types";
+import { Button } from "react-bootstrap";
+import "../app.css";
 
 const Togglable = forwardRef((props, refs) => {
   const [visible, setVisible] = useState(false);
 
-  const hideWhenVisible = { display: visible ? "none" : "" };
+  const hideWhenVisible = {
+    display: visible ? "none" : "",
+    textAlign: "center",
+    margin: "20px 0",
+  };
   const showWhenVisible = { display: visible ? "" : "none" };
 
   const toggleVisibility = () => {
@@ -18,11 +24,15 @@ const Togglable = forwardRef((props, refs) => {
   return (
     <div>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonName}</button>
+        <Button variant="primary" onClick={toggleVisibility}>
+          {props.buttonName}
+        </Button>
       </div>
-      <div style={showWhenVisible}>
+      <div className="bottone-spazio" style={showWhenVisible}>
         {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
+        <Button variant="secondary" onClick={toggleVisibility}>
+          cancel
+        </Button>
       </div>
     </div>
   );

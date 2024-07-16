@@ -4,11 +4,11 @@ const notificationReducer = (
 ) => {
   switch (action.type) {
     case "SET":
-      return { notification: action.payload, class: "notification" };
+      return { notification: action.payload, class: "success" };
     case "ERROR":
-      return { notification: action.payload, class: "error" };
+      return { notification: action.payload, class: "danger" };
     case "RESET":
-      return { notification: null };
+      return { notification: null, class: "null" };
     default:
       return state;
   }

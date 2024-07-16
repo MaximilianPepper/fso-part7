@@ -10,6 +10,17 @@ import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Toggable";
 import { useSelector, useDispatch } from "react-redux"; // redux refactoring es 7.10
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import {
+  Alert,
+  Button,
+  Form,
+  Navbar,
+  Nav,
+  Card,
+  Row,
+  Col,
+  Container,
+} from "react-bootstrap";
 
 const App = () => {
   const [username, setUsername] = useState("");
@@ -72,28 +83,57 @@ const App = () => {
     }
   }, []);
 
+  const BlogList = () => (
+    <Container>
+      <Row>
+        {blogs.map((blog) => (
+          <Col key={blog.id} sm={12} md={6} lg={4} className="mb-4">
+            <Link to={`/blogs/${blog.id}`} style={{ textDecoration: "none" }}>
+              <Card
+                style={{
+                  cursor: "pointer",
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                  ":hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                <Card.Body>
+                  <Card.Title>{blog.title}</Card.Title>
+                  <Card.Text>by {blog.author}</Card.Text>
+                </Card.Body>
+              </Card>
+            </Link>
+          </Col>
+        ))}
+      </Row>
+    </Container>
+  );
   const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input
+    <Form onSubmit={handleLogin}>
+      <Form.Group>
+        <Form.Label>username</Form.Label>
+        <Form.Control
           type="text"
           value={username}
           name="Username"
           onChange={({ target }) => setUsername(target.value)}
         />
-      </div>
-      <div>
-        password
-        <input
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>password</Form.Label>
+        <Form.Control
           type="password"
           value={password}
           name="Password"
           onChange={({ target }) => setPassword(target.value)}
         />
-      </div>
-      <button type="submit">login</button>
-    </form>
+      </Form.Group>
+      <Button className="bottone-spazio" variant="primary" type="submit">
+        login
+      </Button>
+    </Form>
   );
   const logout = () => {
     dispatch({
@@ -141,12 +181,27 @@ const App = () => {
   };
   const loggedIn = () => (
     <Router>
-      <nav>
-        <Link to="/">blogs </Link>
-        <Link to="/users">users </Link>
-        {user.name} logged in
-      </nav>
-      <button onClick={() => logout()}>logout</button>
+      <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="me-auto navbar-nav">
+            <Nav.Link href="#" as="span">
+              <Link to="/">blogs </Link>
+            </Nav.Link>
+            <Nav.Link href="#" as="span">
+              <Link to="/users">users </Link>
+            </Nav.Link>
+            <Nav.Link href="#" as="span">
+              <em>{user.name} logged in</em>
+            </Nav.Link>
+            <Nav.Link href="#" as="span">
+              <Button variant="info" onClick={() => logout()}>
+                logout
+              </Button>
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
       <Togglable buttonName="new blog" ref={blogRef}>
         <BlogForm createBlog={createBlog} />
       </Togglable>
@@ -163,25 +218,16 @@ const App = () => {
             />
           }
         />
-        <Route
-          path="/"
-          element={blogs.map((blog) => (
-            <Link to={`/blogs/${blog.id}`} key={blog.id}>
-              <p>
-                {blog.title} by {blog.author}
-              </p>
-            </Link>
-          ))}
-        />
+        <Route path="/" element={<BlogList />} />
         <Route path="/users" element={<Users users={users} />} />
       </Routes>
     </Router>
   );
   return (
-    <div>
-      <h2>{user ? "blogs" : "login to application"}</h2>
+    <div className="container">
+      <h2>{user ? "Blogs" : "login to application"}</h2>
       {notification && (
-        <div className={notification.class}>{notification.notification}</div>
+        <Alert variant={notification.class}>{notification.notification}</Alert>
       )}
       {user ? loggedIn() : loginForm()}
     </div>

@@ -6,3 +6,15 @@
   color: green;
   border: 2px solid green;
 }
+
+.navbar-nav {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.bottone-spazio button {
+  margin: 5px 0;
+}
+.bottone-spazio {
+  margin: 5px 0;
+}
